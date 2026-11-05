@@ -37,3 +37,11 @@ BAN CHO MEMBER: dung plugin shop/crate/Vault goi lenh
   Shop: lenh console  astrax cyber give %player%
 
 GLOWING: mac bat ky 1 mon giap VIP (Cyber Dragon / set Astrax) -> phat sang. Chinh trong config.yml muc glowing.
+
+===== HAC LONG EXODUS =====
+  /astrax exodus give <nguoi>     tang kiem
+  /astrax exodus apply            ep Exodus vao thanh kiem dang cam
+  6 ky nang bi dong: Dragon Slash, Core Explosion, Blood Engine, Thunder Core, Overlord, Apocalypse
+  Cyber Resonance: cam Exodus + du 4 mon Cyber Dragon -> +5% dmg, -5% dmg nhan, aura do, giap sang khi proc
+  Hieu ung chem: moi don danh co vet chem cong (3 kieu xoay vong), chi mang = chem chu X
+  Shop: lenh console  astrax exodus give %player%

@@ -9,6 +9,7 @@ public class AstraxSkill extends JavaPlugin {
     private SetManager sets;
     private HacLong hac;
     private CyberDragon cyber;
+    private HacLongExodus exodus;
 
     public static AstraxSkill get() {
         return instance;
@@ -26,6 +27,10 @@ public class AstraxSkill extends JavaPlugin {
         return cyber;
     }
 
+    public HacLongExodus exodus() {
+        return exodus;
+    }
+
     @Override
     public void onEnable() {
         instance = this;
@@ -40,6 +45,9 @@ public class AstraxSkill extends JavaPlugin {
         cyber = new CyberDragon(this);
         getServer().getPluginManager().registerEvents(cyber, this);
         cyber.startTasks();
+        exodus = new HacLongExodus(this);
+        getServer().getPluginManager().registerEvents(exodus, this);
+        exodus.startTasks();
         AstraxCommand cmd = new AstraxCommand(this);
         getCommand("astrax").setExecutor(cmd);
         getCommand("astrax").setTabCompleter(cmd);
@@ -55,5 +63,6 @@ public class AstraxSkill extends JavaPlugin {
     @Override
     public void onDisable() {
         if (cyber != null) cyber.shutdown();
+        if (exodus != null) exodus.shutdown();
     }
 }

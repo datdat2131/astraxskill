@@ -79,7 +79,7 @@ public class CyberDragon implements Listener {
     @SuppressWarnings("deprecation")
     private double maxHealth(Player p) { return p.getMaxHealth(); }
 
-    private String piece(ItemStack it) {
+    public String piece(ItemStack it) {
         if (it == null || !it.hasItemMeta()) return null;
         return it.getItemMeta().getPersistentDataContainer().get(PIECE, PersistentDataType.STRING);
     }
@@ -95,6 +95,9 @@ public class CyberDragon implements Listener {
     }
 
     private boolean full(boolean[] w) { return w[0] && w[1] && w[2] && w[3]; }
+
+    /** Đang mặc đủ 4 món Cyber Dragon. */
+    public boolean isFullSet(Player p) { return full(worn(p)); }
 
     // ================= tạo item =================
     public static String slotOf(Material m) {
@@ -209,6 +212,9 @@ public class CyberDragon implements Listener {
 
         if (full(w)) {
             State s = states.computeIfAbsent(v.getUniqueId(), k -> new State());
+
+            // CYBER RESONANCE: cầm kiếm Hắc Long Exodus + đủ giáp -> thêm giảm sát thương
+            if (pl.exodus() != null && pl.exodus().resonant(v)) mult *= 1 - pl.exodus().resonanceReduction();
 
             // I. CYBER SHIELD
             if (now >= s.shieldUntil && now >= s.shieldReady && roll(d("cyber-shield.chance", 15))) {

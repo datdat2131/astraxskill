@@ -36,6 +36,7 @@ public class AstraxCommand implements CommandExecutor, TabCompleter {
         s.sendMessage(c("&e/astrax give <người chơi> <setid> &7- phát trọn bộ set"));
         s.sendMessage(c("&e/astrax hac ... &7- Kiếm huyền thoại Hắc Long (gõ /astrax hac)"));
         s.sendMessage(c("&e/astrax cyber ... &7- Bộ giáp Cyber Dragon (gõ /astrax cyber)"));
+        s.sendMessage(c("&e/astrax exodus ... &7- Kiếm Hắc Long Exodus (gõ /astrax exodus)"));
         s.sendMessage(c("&e/astrax list &7- danh sách skill & set"));
         s.sendMessage(c("&e/astrax reload &7- tải lại config"));
     }
@@ -67,6 +68,7 @@ public class AstraxCommand implements CommandExecutor, TabCompleter {
             case "give" -> give(sender, a);
             case "hac" -> pl.hac().command(sender, a);
             case "cyber" -> pl.cyber().command(sender, a);
+            case "exodus" -> pl.exodus().command(sender, a);
             default -> help(sender);
         }
         return true;
@@ -207,7 +209,7 @@ public class AstraxCommand implements CommandExecutor, TabCompleter {
         List<String> out = new ArrayList<>();
         if (!sender.hasPermission("astrax.admin")) return out;
         if (a.length == 1) {
-            out.addAll(List.of("bind", "unbind", "set", "give", "hac", "cyber", "list", "reload", "help"));
+            out.addAll(List.of("bind", "unbind", "set", "give", "hac", "cyber", "exodus", "list", "reload", "help"));
         } else if (a.length == 2 && (a[0].equalsIgnoreCase("bind") || a[0].equalsIgnoreCase("unbind"))) {
             for (SkillType t : SkillType.values()) out.add(t.name());
             if (a[0].equalsIgnoreCase("unbind")) out.add("all");
@@ -220,6 +222,10 @@ public class AstraxCommand implements CommandExecutor, TabCompleter {
             addSets(out);
         } else if (a.length == 2 && a[0].equalsIgnoreCase("hac")) {
             out.addAll(List.of("give", "apply", "tier", "stone"));
+        } else if (a.length == 2 && a[0].equalsIgnoreCase("exodus")) {
+            out.addAll(List.of("give", "apply"));
+        } else if (a.length == 3 && a[0].equalsIgnoreCase("exodus") && a[1].equalsIgnoreCase("give")) {
+            pl.getServer().getOnlinePlayers().forEach(p -> out.add(p.getName()));
         } else if (a.length == 2 && a[0].equalsIgnoreCase("cyber")) {
             out.addAll(List.of("give", "piece", "apply"));
         } else if (a.length == 3 && a[0].equalsIgnoreCase("cyber")

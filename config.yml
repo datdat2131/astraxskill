@@ -247,3 +247,70 @@ glowing:
   enabled: true
   cyber-dragon: true   # mặc bất kỳ 1 món giáp Cyber Dragon
   astrax-set: true     # mặc bất kỳ 1 món giáp thuộc set Astrax (sets.* trong config)
+
+# ======================================================
+#  ASTRAX - HẮC LONG EXODUS (kiếm VIP mạnh nhất, 6 kỹ năng bị động)
+#  /astrax exodus give <người>
+# ======================================================
+exodus:
+  material: NETHERITE_SWORD
+  name: "&4&l⚔ ʜắᴄ ʟᴏɴɢ ᴇxᴏᴅᴜs"
+  enchants: ["sharpness:3", "unbreaking:3", "looting:3"]
+  slash-fx: true                # hiệu ứng chém mỗi đòn đánh (3 kiểu xoay vòng, chí mạng = chém chữ X)
+  model-data:                   # CustomModelData resource pack (0 = không đổi)
+    normal: 0
+    overlord: 0                 # model khi Overlord đang chạy
+  # (tuỳ chọn) đổi model giáp Cyber Dragon khi cộng hưởng: cyber-dragon.pieces.<slot>.pulse-model-data
+
+  # ----- Chỉ số cơ bản -----
+  stats:
+    damage-bonus: 0.30          # +30% sát thương
+    crit-chance: 25             # %
+    crit-damage: 0.75           # +75% khi chí mạng
+    lifesteal: 0.06             # hút máu 6%
+    max-lifesteal-per-hit: 3    # trần hồi máu mỗi đòn (1.5 tim)
+    attack-speed: 0.15          # +15% tốc độ đánh khi cầm kiếm
+
+  # ----- Cân bằng PvP -----
+  max-multiplier: 2.5           # trần sát thương 1 đòn = 2.5x sát thương gốc (đã gồm chí mạng + kỹ năng)
+  pvp-multiplier: 0.6           # sát thương AOE gây lên người chơi chỉ còn 60%
+
+  skills:
+    # Nhóm TẤN CÔNG: mỗi đòn đánh chỉ tối đa 1 kỹ năng trong 3 cái này kích hoạt
+    dragon-slash:
+      chance: 20
+      cooldown: 4
+      damage-ratio: 0.45        # +45% sát thương lên mục tiêu
+    thunder-core:
+      chance: 15
+      cooldown: 6
+      damage-ratio: 0.35        # +35% sát thương
+    core-explosion:
+      chance: 12
+      cooldown: 8
+      radius: 3
+      damage-ratio: 0.5         # sát thương AOE = 50% đòn đánh
+      max-damage: 8             # trần mỗi mục tiêu
+      max-targets: 5
+    # Nhóm SINH TỒN
+    blood-engine:
+      chance: 15
+      cooldown: 12
+      heal-percent: 0.08        # hồi 8% máu tối đa
+    # Nhóm TỐI THƯỢNG
+    apocalypse:                 # khi hạ gục mục tiêu
+      chance: 10
+      cooldown: 60
+      radius: 5
+      damage: 8                 # trần cố định mỗi mục tiêu
+      max-targets: 6
+
+  overlord:
+    hits: 20                    # đủ 20 đòn tự kích hoạt (không tích khi đang chạy)
+    damage-bonus: 0.30
+    seconds: 8
+
+  # CYBER RESONANCE: cầm Exodus + đủ 4 món Cyber Dragon
+  resonance:
+    damage-bonus: 0.05
+    damage-reduction: 0.05
