@@ -1,0 +1,15 @@
+name: AstraxSkill
+version: 1.0.0
+main: vn.astrax.skill.AstraxSkill
+api-version: '1.21'
+author: Astrax
+description: Ep skill vao kiem va giap, set do huyen thoai
+commands:
+  astrax:
+    description: Lenh chinh cua AstraxSkill
+    aliases: [askill]
+    usage: /astrax help
+permissions:
+  astrax.admin:
+    description: Toan quyen AstraxSkill
+    default: op

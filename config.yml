@@ -1,0 +1,96 @@
+# ===== AstraxSkill config =====
+max-level: 5
+pvp: true            # skill chủ động có đánh được người chơi khác không
+
+# chance: % kích hoạt (kiếm: khi đánh, giáp: khi bị đánh)
+# power: sức mạnh, ý nghĩa tuỳ skill (xem ghi chú)
+# cooldown: giây hồi chiêu của skill chủ động (chuột phải / shift + chuột phải)
+skills:
+  FLAME:       # power = số giây thiêu đốt
+    chance: 15
+    chance-per-level: 5
+    power: 4
+    power-per-level: 1
+    cooldown: 8
+  LIGHTNING:   # power = sát thương sét cộng thêm
+    chance: 10
+    chance-per-level: 4
+    power: 4
+    power-per-level: 2
+    cooldown: 12
+  LIFESTEAL:   # power = % sát thương hồi lại thành máu
+    chance: 20
+    chance-per-level: 5
+    power: 15
+    power-per-level: 5
+    cooldown: 10
+  FREEZE:      # power = số giây làm chậm
+    chance: 15
+    chance-per-level: 5
+    power: 3
+    power-per-level: 1
+    cooldown: 10
+  GUARD:       # power = % giảm sát thương
+    chance: 15
+    chance-per-level: 5
+    power: 30
+    power-per-level: 10
+    cooldown: 20
+  REFLECT:     # power = % sát thương phản lại kẻ tấn công
+    chance: 15
+    chance-per-level: 5
+    power: 40
+    power-per-level: 10
+    cooldown: 15
+  REGEN:       # power = lượng máu hồi (1 = nửa tim)
+    chance: 12
+    chance-per-level: 4
+    power: 4
+    power-per-level: 2
+    cooldown: 25
+
+# ===== SET ĐỒ =====
+# tiers: số món đang mặc/cầm cùng set (tối đa 5: 4 giáp + 1 kiếm)
+sets:
+  astrax:
+    name: "&6&lAstrax Huyền Thoại"
+    tiers:
+      '2':
+        effects: ["SPEED:0"]
+        damage-bonus: 0.05
+        damage-reduction: 0.05
+      '4':
+        effects: ["RESISTANCE:0", "JUMP_BOOST:1"]
+        damage-bonus: 0.10
+        damage-reduction: 0.10
+      '5':
+        effects: ["STRENGTH:0", "REGENERATION:0", "FIRE_RESISTANCE:0"]
+        damage-bonus: 0.20
+        damage-reduction: 0.15
+    # Dùng cho: /astrax give <người chơi> astrax
+    items:
+      sword:
+        material: NETHERITE_SWORD
+        name: "&6&lKiếm Astrax"
+        enchants: ["sharpness:5", "unbreaking:3", "looting:3", "fire_aspect:2"]
+        skills: ["FLAME:3", "LIGHTNING:3", "LIFESTEAL:2"]
+      helmet:
+        material: NETHERITE_HELMET
+        name: "&6&lMũ Astrax"
+        enchants: ["protection:4", "unbreaking:3", "respiration:3"]
+        skills: ["GUARD:2", "REGEN:1"]
+      chestplate:
+        material: NETHERITE_CHESTPLATE
+        name: "&6&lÁo Giáp Astrax"
+        enchants: ["protection:4", "unbreaking:3"]
+        skills: ["GUARD:3", "REFLECT:2"]
+      leggings:
+        material: NETHERITE_LEGGINGS
+        name: "&6&lQuần Astrax"
+        enchants: ["protection:4", "unbreaking:3"]
+        skills: ["REFLECT:2", "REGEN:2"]
+      boots:
+        material: NETHERITE_BOOTS
+        name: "&6&lGiày Astrax"
+        enchants: ["protection:4", "unbreaking:3", "feather_falling:4"]
+        skills: ["GUARD:1", "REGEN:2"]
