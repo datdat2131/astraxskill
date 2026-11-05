@@ -87,6 +87,11 @@ public class HacLong implements Listener {
         return 0;
     }
 
+    /** true = Giáng Thế dùng Shift + chuột phải; false = dùng phím F (cũ). */
+    public boolean ultOnShiftClick() {
+        return !"f".equalsIgnoreCase(cfg().getString("hac-long.ultimate-key", "shift-right-click"));
+    }
+
     private boolean isRaging(Player p) {
         Long u = rage.get(p.getUniqueId());
         return u != null && System.currentTimeMillis() < u;
@@ -243,6 +248,7 @@ public class HacLong implements Listener {
 
         claw(v.getLocation().add(0, 1, 0), p.getLocation().getDirection());
         p.getWorld().playSound(v.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.7f);
+        Sfx.clang(v.getLocation(), false);
 
         // Long Huyết (nội tại)
         double chance = cfg().getDouble("hac-long.long-huyet.chance", 12);
@@ -289,6 +295,7 @@ public class HacLong implements Listener {
         rage.put(p.getUniqueId(), System.currentTimeMillis() + dur);
         charge.put(p.getUniqueId(), 0);
         p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 0.5f);
+        Sfx.skill(p.getLocation(), "overlord");
         fx(p.getWorld(), Particle.FLAME, p.getLocation().add(0, 1, 0), 120, 0.8, 1, 0.8, 0.12);
         ItemStack h = p.getInventory().getItemInMainHand();
         setModel(h, tier, true);
@@ -352,9 +359,17 @@ public class HacLong implements Listener {
         Action a = e.getAction();
         if (a != Action.RIGHT_CLICK_AIR && a != Action.RIGHT_CLICK_BLOCK) return;
         Player p = e.getPlayer();
-        if (p.isSneaking()) return; // Shift + chuột phải dành cho skill giáp
         int tier = tier(p.getInventory().getItemInMainHand());
         if (tier == 0) return;
+
+        // Shift + chuột phải = Hắc Long Giáng Thế (nếu ultimate-key = shift-right-click)
+        if (p.isSneaking()) {
+            if (!ultOnShiftClick()) return;
+            long gl = cdLeft(p, "GT", cfg().getDouble("hac-long.cooldowns.giang-the", 45));
+            if (gl > 0) { bar(p, "&cHắc Long Giáng Thế hồi chiêu: " + gl + "s"); return; }
+            giangThe(p, tier);
+            return;
+        }
         long left = cdLeft(p, "LT", cfg().getDouble("hac-long.cooldowns.long-tram", 10));
         if (left > 0) { bar(p, "&cLong Trảm hồi chiêu: " + left + "s"); return; }
         longTram(p, tier);
@@ -371,6 +386,7 @@ public class HacLong implements Listener {
         w.playSound(origin, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1f, 0.6f);
         w.playSound(origin, Sound.ITEM_FIRECHARGE_USE, 1f, 0.8f);
         bar(p, "&c✦ Long Trảm!");
+        Sfx.skill(origin, "dragon-slash");
 
         new BukkitRunnable() {
             int s = 0;
@@ -399,6 +415,7 @@ public class HacLong implements Listener {
     // ================= Hắc Long Giáng Thế: phím F =================
     @EventHandler
     public void onSwap(PlayerSwapHandItemsEvent e) {
+        if (ultOnShiftClick()) return; // phím F chỉ dùng khi ultimate-key: f
         int tier = tier(e.getOffHandItem());
         if (tier == 0) return;
         e.setCancelled(true);
@@ -480,6 +497,7 @@ public class HacLong implements Listener {
         World w = at.getWorld();
         w.playSound(at, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0.7f);
         w.playSound(at, Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.0f);
+        Sfx.skill(at, "apocalypse");
         fx(w, Particle.FLAME, at, 150, radius / 2, 0.8, radius / 2, 0.15);
         fx(w, Particle.EXPLOSION, at, 3, radius / 3, 0.3, radius / 3, 0);
         fx(w, Particle.DRAGON_BREATH, at, 60, radius / 2, 0.5, radius / 2, 0.05);

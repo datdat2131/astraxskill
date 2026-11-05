@@ -231,6 +231,8 @@ public class AstraxCommand implements CommandExecutor, TabCompleter {
         } else if (a.length == 3 && a[0].equalsIgnoreCase("cyber")
                 && (a[1].equalsIgnoreCase("give") || a[1].equalsIgnoreCase("piece"))) {
             pl.getServer().getOnlinePlayers().forEach(p -> out.add(p.getName()));
+        } else if (a.length == 3 && a[0].equalsIgnoreCase("cyber") && a[1].equalsIgnoreCase("apply")) {
+            out.addAll(List.of("helmet", "chestplate", "leggings", "boots"));
         } else if (a.length == 4 && a[0].equalsIgnoreCase("cyber") && a[1].equalsIgnoreCase("piece")) {
             out.addAll(List.of("helmet", "chestplate", "leggings", "boots"));
         } else if (a.length == 3 && a[0].equalsIgnoreCase("hac")

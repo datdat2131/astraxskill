@@ -16,7 +16,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -46,6 +51,7 @@ public class CyberDragon implements Listener {
     private final Random rnd = new Random();
     private final Set<UUID> glowing = new HashSet<>();
     private Attribute speedAttr;
+    private volatile boolean nativeEquip = detectNative();
 
     public CyberDragon(AstraxSkill pl) {
         this.pl = pl;
@@ -167,6 +173,8 @@ public class CyberDragon implements Listener {
         }
         int model = s == null ? 0 : s.getInt("model-data", 0);
         if (model != 0) m.setCustomModelData(model);
+        // Món không phải giáp thật (giấy, v.v.) -> cho phép đội/mặc được
+        if (slotOf(it.getType()) == null) makeEquippable(m, slot, s == null ? "" : s.getString("equip-model", ""));
         it.setItemMeta(m);
     }
 
@@ -222,6 +230,7 @@ public class CyberDragon implements Listener {
                 s.shieldReady = now + ms(d("cyber-shield.cooldown", 45));
                 bar(v, "&b⚡ CYBER SHIELD &7kích hoạt!");
                 v.getWorld().playSound(v.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1f, 1.6f);
+                Sfx.skill(v.getLocation(), "shield");
             }
             if (now < s.shieldUntil) mult *= 1 - d("cyber-shield.reduction", 0.40);
 
@@ -232,6 +241,7 @@ public class CyberDragon implements Listener {
                 v.setHealth(Math.min(max, v.getHealth() + max * d("energy-absorption.heal-percent", 0.05)));
                 bar(v, "&a⚡ ENERGY ABSORPTION &7hồi " + pct(d("energy-absorption.heal-percent", 0.05)) + "% máu");
                 v.getWorld().playSound(v.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1f, 1.2f);
+                Sfx.skill(v.getLocation(), "absorb");
                 fx(v.getWorld(), Particle.HEART, v.getLocation().add(0, 2, 0), 4, 0.3, 0.2, 0.3, 0);
             }
 
@@ -261,6 +271,7 @@ public class CyberDragon implements Listener {
             updateSpeed(p, worn(p), true, s, now);
             p.sendTitle("", c("&6&l⚡ ULTIMATE MODE"), 3, 25, 8);
             p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 1.5f);
+            Sfx.skill(p.getLocation(), "ultimate");
             fx(p.getWorld(), Particle.END_ROD, p.getLocation().add(0, 1, 0), 40, 0.5, 0.8, 0.5, 0.1);
             return;
         }
@@ -270,6 +281,7 @@ public class CyberDragon implements Listener {
             updateSpeed(p, worn(p), true, s, now);
             bar(p, "&c⚡ OVERDRIVE &7kích hoạt!");
             p.getWorld().playSound(p.getLocation(), Sound.ENTITY_BLAZE_SHOOT, 1f, 0.8f);
+            Sfx.skill(p.getLocation(), "overdrive");
             fx(p.getWorld(), Particle.FLAME, p.getLocation().add(0, 1, 0), 30, 0.4, 0.7, 0.4, 0.06);
         }
     }
@@ -381,6 +393,130 @@ public class CyberDragon implements Listener {
         }
     }
 
+
+    // ================= Món KHÔNG phải giáp thật (vd: giấy) đội/mặc được =================
+    private boolean detectNative() {
+        try {
+            ItemMeta.class.getMethod("setEquippable", Class.forName("org.bukkit.inventory.meta.components.EquippableComponent"));
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** 1.21.2+: dùng component Equippable gốc của game. Server cũ hơn: dùng cơ chế click phải / thả vào ô giáp bên dưới. */
+    private void makeEquippable(ItemMeta m, String slot, String equipModel) {
+        if (!nativeEquip) return;
+        try {
+            Class<?> ec = Class.forName("org.bukkit.inventory.meta.components.EquippableComponent");
+            Object comp = ItemMeta.class.getMethod("getEquippable").invoke(m);
+            EquipmentSlot es = switch (slot) {
+                case "helmet" -> EquipmentSlot.HEAD;
+                case "chestplate" -> EquipmentSlot.CHEST;
+                case "leggings" -> EquipmentSlot.LEGS;
+                default -> EquipmentSlot.FEET;
+            };
+            ec.getMethod("setSlot", EquipmentSlot.class).invoke(comp, es);
+            if (equipModel != null && !equipModel.isEmpty()) {
+                NamespacedKey key = NamespacedKey.fromString(equipModel);
+                if (key != null) ec.getMethod("setModel", NamespacedKey.class).invoke(comp, key);
+            }
+            ItemMeta.class.getMethod("setEquippable", ec).invoke(m, comp);
+        } catch (Throwable t) {
+            nativeEquip = false; // không dùng được -> chuyển sang cơ chế dự phòng
+        }
+    }
+
+    private boolean isCustomWearable(ItemStack it) {
+        return it != null && it.getType() != Material.AIR && slotOf(it.getType()) == null && piece(it) != null;
+    }
+
+    private ItemStack getWorn(PlayerInventory inv, String slot) {
+        return switch (slot) {
+            case "helmet" -> inv.getHelmet();
+            case "chestplate" -> inv.getChestplate();
+            case "leggings" -> inv.getLeggings();
+            default -> inv.getBoots();
+        };
+    }
+
+    private void setWorn(PlayerInventory inv, String slot, ItemStack it) {
+        switch (slot) {
+            case "helmet" -> inv.setHelmet(it);
+            case "chestplate" -> inv.setChestplate(it);
+            case "leggings" -> inv.setLeggings(it);
+            default -> inv.setBoots(it);
+        }
+    }
+
+    private int armorIndex(String slot) {
+        return switch (slot) { case "helmet" -> 39; case "chestplate" -> 38; case "leggings" -> 37; default -> 36; };
+    }
+
+    private void equipSound(Player p) {
+        p.getWorld().playSound(p.getLocation(), Sound.ITEM_ARMOR_EQUIP_NETHERITE, 1f, 1.1f);
+    }
+
+    /** Dự phòng: click phải khi cầm vật phẩm -> đội/mặc (đổi với món đang mặc). */
+    @EventHandler
+    public void onEquipUse(PlayerInteractEvent e) {
+        if (nativeEquip || e.getHand() != EquipmentSlot.HAND) return;
+        Action a = e.getAction();
+        if (a != Action.RIGHT_CLICK_AIR && a != Action.RIGHT_CLICK_BLOCK) return;
+        Player p = e.getPlayer();
+        ItemStack hand = p.getInventory().getItemInMainHand();
+        if (!isCustomWearable(hand)) return;
+        String slot = piece(hand);
+        PlayerInventory inv = p.getInventory();
+        ItemStack old = getWorn(inv, slot);
+        boolean empty = old == null || old.getType() == Material.AIR;
+        e.setCancelled(true);
+        ItemStack one = hand.clone();
+        one.setAmount(1);
+        if (hand.getAmount() > 1) {
+            if (!empty) return;
+            hand.setAmount(hand.getAmount() - 1);
+            inv.setItemInMainHand(hand);
+            setWorn(inv, slot, one);
+        } else {
+            setWorn(inv, slot, one);
+            inv.setItemInMainHand(empty ? null : old);
+        }
+        equipSound(p);
+    }
+
+    /** Dự phòng: thả vào ô giáp trong túi đồ hoặc shift-click để mặc. */
+    @EventHandler
+    public void onEquipClick(InventoryClickEvent e) {
+        if (nativeEquip || !(e.getWhoClicked() instanceof Player p)) return;
+        if (e.getClickedInventory() != p.getInventory()) return;
+        PlayerInventory inv = p.getInventory();
+
+        ItemStack cursor = e.getCursor();
+        if (isCustomWearable(cursor) && e.getSlotType() == InventoryType.SlotType.ARMOR
+                && e.getSlot() == armorIndex(piece(cursor)) && cursor.getAmount() == 1) {
+            e.setCancelled(true);
+            String slot = piece(cursor);
+            ItemStack old = getWorn(inv, slot);
+            setWorn(inv, slot, cursor.clone());
+            p.setItemOnCursor(old == null || old.getType() == Material.AIR ? null : old);
+            equipSound(p);
+            return;
+        }
+        ItemStack cur = e.getCurrentItem();
+        if (e.isShiftClick() && e.getSlotType() != InventoryType.SlotType.ARMOR
+                && isCustomWearable(cur) && cur.getAmount() == 1) {
+            String slot = piece(cur);
+            ItemStack old = getWorn(inv, slot);
+            if (old == null || old.getType() == Material.AIR) {
+                e.setCancelled(true);
+                setWorn(inv, slot, cur.clone());
+                e.setCurrentItem(null);
+                equipSound(p);
+            }
+        }
+    }
+
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         states.remove(e.getPlayer().getUniqueId());
@@ -408,7 +544,7 @@ public class CyberDragon implements Listener {
         if (a.length < 2) {
             s.sendMessage(c("&b/astrax cyber give <người> &7- tặng trọn bộ 4 món"));
             s.sendMessage(c("&b/astrax cyber piece <người> <helmet|chestplate|leggings|boots> &7- tặng 1 món"));
-            s.sendMessage(c("&b/astrax cyber apply &7- ép nội tại Cyber Dragon vào món giáp đang cầm"));
+            s.sendMessage(c("&b/astrax cyber apply [slot] &7- ép nội tại vào món đang cầm (giấy/vật phẩm khác: ghi slot, vd: helmet)"));
             return;
         }
         switch (a[1].toLowerCase()) {
@@ -432,11 +568,22 @@ public class CyberDragon implements Listener {
             case "apply" -> {
                 if (!(s instanceof Player p)) { s.sendMessage("Chỉ dùng trong game."); return; }
                 ItemStack h = p.getInventory().getItemInMainHand();
+                if (h.getType() == Material.AIR) { s.sendMessage(c("&cHãy cầm vật phẩm trên tay.")); return; }
                 String slot = slotOf(h.getType());
-                if (slot == null) { s.sendMessage(c("&cHãy cầm một món giáp (mũ/áo/quần/giày).")); return; }
+                boolean custom = slot == null;
+                if (custom) {
+                    if (a.length < 3 || !Arrays.asList(SLOTS).contains(a[2].toLowerCase())) {
+                        s.sendMessage(c("&cĐây không phải giáp thật. Dùng: /astrax cyber apply <helmet|chestplate|leggings|boots>"));
+                        return;
+                    }
+                    slot = a[2].toLowerCase();
+                }
                 apply(h, slot, false);
                 p.getInventory().setItemInMainHand(h);
-                s.sendMessage(c("&aĐã ép nội tại Cyber Dragon (" + slot + ") vào giáp."));
+                s.sendMessage(c("&aĐã ép nội tại Cyber Dragon (" + slot + ") vào vật phẩm."));
+                if (custom) s.sendMessage(c(nativeEquip
+                        ? "&7Vật phẩm này đã có thể mặc như giáp (click phải hoặc kéo vào ô giáp)."
+                        : "&7Vật phẩm này mặc bằng cách: click phải khi cầm, hoặc thả vào ô giáp trong túi đồ."));
             }
             default -> s.sendMessage(c("&cLệnh con không tồn tại. Gõ /astrax cyber"));
         }

@@ -229,15 +229,18 @@ public class HacLongExodus implements Listener {
                 case "dragon-slash" -> {
                     dmg *= 1 + d("skills.dragon-slash.damage-ratio", 0.45);
                     dragonSlashFx(p);
+                    Sfx.skill(p.getLocation(), "dragon-slash");
                     bar(p, "&c⚔ DRAGON SLASH");
                 }
                 case "thunder-core" -> {
                     dmg *= 1 + d("skills.thunder-core.damage-ratio", 0.35);
                     thunderFx(p, v);
+                    Sfx.skill(p.getLocation(), "thunder");
                     bar(p, "&e⚡ THUNDER CORE");
                 }
                 default -> {
                     coreExplosion(p, v, dmg);
+                    Sfx.skill(p.getLocation(), "core");
                     bar(p, "&6✹ CORE EXPLOSION");
                 }
             }
@@ -254,6 +257,7 @@ public class HacLongExodus implements Listener {
         // --- BLOOD ENGINE (nhóm sinh tồn) ---
         if (ready(s, "blood-engine", now) && roll(d("skills.blood-engine.chance", 15))) {
             cdStart(s, "blood-engine", now, d("skills.blood-engine.cooldown", 12));
+            Sfx.skill(p.getLocation(), "blood");
             heal(p, maxHealth(p) * d("skills.blood-engine.heal-percent", 0.08));
             fx(p.getWorld(), Particle.HEART, p.getLocation().add(0, 2, 0), 5, 0.3, 0.2, 0.3, 0);
             for (int i = 0; i < 12; i++) {
@@ -272,6 +276,7 @@ public class HacLongExodus implements Listener {
                 s.overlordUntil = now + ms(d("overlord.seconds", 8));
                 p.sendTitle("", c("&4&l⚔ OVERLORD"), 3, 25, 8);
                 p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 0.9f);
+                Sfx.skill(p.getLocation(), "overlord");
                 fx(p.getWorld(), Particle.FLAME, p.getLocation().add(0, 1, 0), 60, 0.6, 0.9, 0.6, 0.08);
                 ItemStack h = p.getInventory().getItemInMainHand();
                 setModel(h, true);
@@ -283,8 +288,10 @@ public class HacLongExodus implements Listener {
             }
         }
 
-        // --- Hiệu ứng chém ---
+        // --- Tiếng leng keng + hiệu ứng chém ---
+        Sfx.clang(v.getLocation(), crit);
         if (cfg().getBoolean("exodus.slash-fx", true)) slashFx(p, v, crit);
+        if (cfg().getBoolean("exodus.impact.enabled", true)) impact(p, v, crit);
         if (crit) {
             p.getWorld().playSound(v.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1f, 0.8f);
             fx(p.getWorld(), Particle.CRIT, v.getLocation().add(0, 1, 0), 25, 0.3, 0.5, 0.3, 0.4);
@@ -317,6 +324,7 @@ public class HacLongExodus implements Listener {
         int max = (int) d("skills.apocalypse.max-targets", 6);
         w.playSound(at, Sound.ENTITY_GENERIC_EXPLODE, 1f, 0.6f);
         w.playSound(at, Sound.ENTITY_ENDER_DRAGON_GROWL, 1f, 0.8f);
+        Sfx.skill(at, "apocalypse");
         fx(w, Particle.EXPLOSION_EMITTER, at, 1, 0, 0, 0, 0);
         int n = 0;
         for (Entity en : w.getNearbyEntities(at, r, r, r)) {
@@ -401,6 +409,34 @@ public class HacLongExodus implements Listener {
         }.runTaskTimer(pl, 0L, 1L);
     }
 
+    // ================= LỰC CHÉM: xung lực đẩy lùi nhẹ + sóng chấn dưới chân =================
+    private void impact(Player p, LivingEntity v, boolean crit) {
+        double kb = d("impact.knockback", 0.35) * (crit ? d("impact.crit-multiplier", 1.6) : 1.0);
+        double lift = d("impact.lift", 0.12);
+        Vector dir = v.getLocation().toVector().subtract(p.getLocation().toVector()).setY(0);
+        if (dir.lengthSquared() < 1e-6) dir = p.getLocation().getDirection().setY(0);
+        if (dir.lengthSquared() < 1e-6) return;
+        final Vector push = dir.normalize().multiply(kb).setY(lift);
+        // Chạy sau 1 tick để cộng thêm lên knockback gốc của game, có trần tốc độ để không bị hất bay quá xa
+        Bukkit.getScheduler().runTask(pl, () -> {
+            if (v.isDead() || !v.isValid()) return;
+            Vector nv = v.getVelocity().add(push);
+            if (nv.length() > 1.0) nv.normalize();
+            v.setVelocity(nv);
+        });
+        World w = v.getWorld();
+        Location at = v.getLocation().add(0, 0.15, 0);
+        double r = crit ? 1.1 : 0.8;
+        for (int i = 0; i < 18; i++) {
+            double a = i * Math.PI * 2 / 18;
+            Location l = at.clone().add(Math.cos(a) * r, 0, Math.sin(a) * r);
+            dust(w, l, RED, 1.2f);
+            if (i % 3 == 0) dust(w, l.clone().add(0, 0.1, 0), EDGE, 0.9f);
+        }
+        fx(w, Particle.CLOUD, at, crit ? 10 : 5, 0.3, 0.05, 0.3, 0.04);
+        Sfx.impact(at, crit);
+    }
+
     // ================= HIỆU ỨNG CHÉM =================
     private Vector axis(Vector f, double tiltDeg) {
         Vector right = f.clone().crossProduct(new Vector(0, 1, 0));
@@ -472,6 +508,7 @@ public class HacLongExodus implements Listener {
         }
         fx(w, Particle.ELECTRIC_SPARK, p.getLocation().add(0, 1, 0), 25, 0.5, 0.8, 0.5, 0.2);
         w.playSound(p.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 0.7f, 1.8f);
+        Sfx.skill(p.getLocation(), "resonance");
 
         // Tuỳ chọn resource pack: đổi model giáp sang bản "sáng" trong 1 giây
         PlayerInventory inv = p.getInventory();

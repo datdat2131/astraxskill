@@ -23,7 +23,7 @@ BAN CHO MEMBER: dung plugin shop/crate/Vault goi lenh
   /astrax hac tier <1-3>               chinh cap kiem dang cam
   /astrax hac stone <nguoi> [sl]       tang Da Nang Cap (keo tha len kiem trong tui do)
 
-  Chuot phai = Long Trang | Phim F = Hac Long Giang The
+  Chuot phai = Long Trang | Shift + chuot phai = Hac Long Giang The (doi ve phim F: hac-long.ultimate-key: f)
   Noi tai Long Huyet 12% | Danh du 100 nang luong -> Long No 10s
   Resource pack: dien CustomModelData vao hac-long.model-data trong config.yml
   Shop: lenh console  astrax hac give %player% 1   /   astrax hac stone %player% 1
@@ -45,3 +45,17 @@ GLOWING: mac bat ky 1 mon giap VIP (Cyber Dragon / set Astrax) -> phat sang. Chi
   Cyber Resonance: cam Exodus + du 4 mon Cyber Dragon -> +5% dmg, -5% dmg nhan, aura do, giap sang khi proc
   Hieu ung chem: moi don danh co vet chem cong (3 kieu xoay vong), chi mang = chem chu X
   Shop: lenh console  astrax exodus give %player%
+
+MU GIAY / VAT PHAM KHAC LAM GIAP:
+  Cam mon giay cua ban -> /astrax cyber apply helmet   (giu nguyen CustomModelData)
+  Hoac dat pieces.helmet.material: PAPER trong config roi /astrax cyber give
+  Server 1.21.2+: dung component Equippable goc. Server cu hon: click phai / tha vao o giap de mac.
+AM THANH: config.yml muc sounds (enabled, sword-clang, skills, volume)
+
+MU GIAY / VAT PHAM KHAC LAM GIAP:
+  Cam mon giay cua ban -> /astrax cyber apply helmet   (giu nguyen CustomModelData)
+  Hoac dat pieces.helmet.material: PAPER trong config roi /astrax cyber give
+  Server 1.21.2+: dung component Equippable goc. Server cu hon: click phai / tha vao o giap de mac.
+AM THANH: config.yml muc sounds (enabled, sword-clang, skills, volume)
+
+EXODUS LUC CHEM: exodus.impact trong config (day lui nhe + song chan + tieng xung luc, sounds.impact)

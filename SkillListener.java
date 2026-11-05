@@ -172,6 +172,7 @@ public class SkillListener implements Listener {
 
         Player p = e.getPlayer();
         boolean armorMode = p.isSneaking();
+        if (armorMode && pl.hac().ultOnShiftClick() && pl.hac().tier(p.getInventory().getItemInMainHand()) > 0) return;
         Map<SkillType, Integer> skills = armorMode ? armorSkills(p) : weaponSkills(p);
         if (skills.isEmpty()) return;
 

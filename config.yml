@@ -104,6 +104,9 @@ hac-long:
   material: NETHERITE_SWORD
   enchants: ["sharpness:4", "unbreaking:3", "fire_aspect:1", "looting:3"]
 
+  # Phím dùng Hắc Long Giáng Thế: shift-right-click (Shift + chuột phải) hoặc f (phím F)
+  ultimate-key: shift-right-click
+
   names:
     1: "&4&l☠ ASTRAX • HẮC LONG"
     2: "&4&l☠ ASTRAX • HẮC LONG THỨC TỈNH"
@@ -173,7 +176,7 @@ hac-long:
     - ""
     - "&6✦ KỸ NĂNG"
     - "&c➤ Long Trảm &7(Chuột phải)"
-    - "&c➤ Hắc Long Giáng Thế &7(Phím F)"
+    - "&c➤ Hắc Long Giáng Thế &7(Shift + Chuột phải)"
     - "&c➤ Long Huyết &7(Nội tại)"
     - "&c➤ Long Nộ &7(Tích đủ năng lượng)"
     - "&8━━━━━━━━━━━━━━━━"
@@ -190,6 +193,10 @@ cyber-dragon:
       name: "&b&l⚡ Mũ Cyber Dragon"
       enchants: ["protection:4", "unbreaking:3", "respiration:3"]
       model-data: 0
+      # Muốn dùng món GIẤY (PAPER) làm mũ: để material: PAPER, hoặc cầm món giấy của bạn gõ
+      # /astrax cyber apply helmet (giữ nguyên CustomModelData). Server 1.21.2+ có thể điền
+      # equip-model: "namespace:ten_asset" để mũ hiện trên đầu bằng model của resource pack.
+      equip-model: ""
     chestplate:
       material: NETHERITE_CHESTPLATE
       name: "&b&l⚡ Giáp Ngực Cyber Dragon"
@@ -271,6 +278,13 @@ exodus:
     max-lifesteal-per-hit: 3    # trần hồi máu mỗi đòn (1.5 tim)
     attack-speed: 0.15          # +15% tốc độ đánh khi cầm kiếm
 
+  # ----- Lực chém: đòn đánh có xung lực đẩy lùi nhẹ + sóng chấn dưới chân mục tiêu -----
+  impact:
+    enabled: true
+    knockback: 0.35       # lực đẩy thêm (vanilla ~0.4)
+    crit-multiplier: 1.6  # chí mạng đẩy mạnh hơn
+    lift: 0.12            # nảy lên nhẹ
+
   # ----- Cân bằng PvP -----
   max-multiplier: 2.5           # trần sát thương 1 đòn = 2.5x sát thương gốc (đã gồm chí mạng + kỹ năng)
   pvp-multiplier: 0.6           # sát thương AOE gây lên người chơi chỉ còn 60%
@@ -314,3 +328,13 @@ exodus:
   resonance:
     damage-bonus: 0.05
     damage-reduction: 0.05
+
+# ======================================================
+#  ÂM THANH
+# ======================================================
+sounds:
+  enabled: true        # công tắc tổng (false = tắt toàn bộ âm thanh bổ sung)
+  sword-clang: true    # tiếng "leng keng" khi kiếm chém trúng (Hắc Long & Exodus)
+  skills: true         # lớp âm thanh bổ sung khi kích hoạt kỹ năng / giáp
+  impact: true         # tiếng xung lực khi đòn chém Exodus đẩy lùi mục tiêu
+  volume: 1.0          # nhân âm lượng (0.5 = nhỏ một nửa)
