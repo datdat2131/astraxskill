@@ -94,3 +94,156 @@ sets:
         name: "&6&lGiày Astrax"
         enchants: ["protection:4", "unbreaking:3", "feather_falling:4"]
         skills: ["GUARD:1", "REGEN:2"]
+
+# ======================================================
+#  ASTRAX - HẮC LONG (kiếm huyền thoại, 3 cấp tiến hóa)
+#  Chuột phải = Long Trảm | Phím F = Hắc Long Giáng Thế
+#  Nội tại: Long Huyết | Tích đủ năng lượng: Long Nộ
+# ======================================================
+hac-long:
+  material: NETHERITE_SWORD
+  enchants: ["sharpness:4", "unbreaking:3", "fire_aspect:1", "looting:3"]
+
+  names:
+    1: "&4&l☠ ASTRAX • HẮC LONG"
+    2: "&4&l☠ ASTRAX • HẮC LONG THỨC TỈNH"
+    3: "&4&l☠ ASTRAX • HẮC LONG THẦN DIỆT"
+
+  # CustomModelData cho resource pack / Oraxen (0 = không đổi model).
+  # tierX = model bình thường, rageX = model khi Long Nộ (lưỡi sáng đỏ mạnh).
+  model-data:
+    tier1: 0
+    tier2: 0
+    tier3: 0
+    rage1: 0
+    rage2: 0
+    rage3: 0
+
+  # ----- Cân bằng PvP -----
+  max-damage: 12          # trần sát thương của mọi skill (đã tính giáp, KHÔNG xuyên giáp)
+  pvp-multiplier: 0.6     # skill đánh người chơi chỉ còn 60% sát thương
+  damage:
+    long-tram: [6, 7, 8]  # theo cấp 1/2/3
+    giang-the: [8, 10, 12]
+
+  cooldowns:
+    long-tram: 10
+    giang-the: 45
+  long-tram-range: 10
+  giang-the:
+    reach: 22
+    radius: 4
+
+  long-huyet:             # nội tại
+    chance: 12            # %
+    seconds: 4            # Strength I trong 4 giây
+    internal-cooldown: 6
+
+  rage:                   # Long Nộ
+    charge-per-hit: 8
+    charge-max: 100
+    seconds: 10
+    damage-bonus: 0.15    # +15% sát thương đánh thường khi Long Nộ
+
+  # Đá nâng cấp: kéo thả đá lên kiếm trong túi đồ. Số đá cần theo cấp hiện tại.
+  upgrade-cost:
+    1: 1                  # cấp 1 -> 2
+    2: 2                  # cấp 2 -> 3
+  stone:
+    material: NETHER_STAR
+    name: "&c&l✦ Đá Nâng Cấp Hắc Long"
+    lore:
+      - "&7Kéo thả vào &4Kiếm Hắc Long"
+      - "&7trong túi đồ để tiến hóa."
+      - ""
+      - "&4&lCHỈ BÁN TẠI SHOP VIP ASTRAX"
+
+  lore:
+    - "&cᴍʏᴛʜɪᴄᴀʟ ᴡᴇᴀᴘᴏɴ"
+    - "&8━━━━━━━━━━━━━━━━"
+    - "&7Thanh kiếm được tạo ra từ"
+    - "&7xương và huyết mạch của Hắc Long."
+    - "&7Ngọn lửa đỏ vẫn luôn cháy"
+    - "&7bên trong lưỡi kiếm cổ đại."
+    - ""
+    - "&c☠ &fSức mạnh: &cHuyền thoại"
+    - "&c✦ &fHệ: &4Hắc Long"
+    - "&c✦ &fĐộ hiếm: &4Mythical"
+    - "&c✦ &fTiến hóa: &e{tier_name}"
+    - ""
+    - "&6✦ KỸ NĂNG"
+    - "&c➤ Long Trảm &7(Chuột phải)"
+    - "&c➤ Hắc Long Giáng Thế &7(Phím F)"
+    - "&c➤ Long Huyết &7(Nội tại)"
+    - "&c➤ Long Nộ &7(Tích đủ năng lượng)"
+    - "&8━━━━━━━━━━━━━━━━"
+    - "&4&lCHỈ CÓ THỂ MUA TẠI SHOP VIP ASTRAX"
+
+# ======================================================
+#  CYBER DRAGON - BỘ GIÁP NỘI TẠI (Passive, tự kích hoạt)
+#  Chỉ cần mặc giáp. Đủ 4 món mới có 4 kỹ năng bộ.
+# ======================================================
+cyber-dragon:
+  pieces:
+    helmet:
+      material: NETHERITE_HELMET
+      name: "&b&l⚡ Mũ Cyber Dragon"
+      enchants: ["protection:4", "unbreaking:3", "respiration:3"]
+      model-data: 0
+    chestplate:
+      material: NETHERITE_CHESTPLATE
+      name: "&b&l⚡ Giáp Ngực Cyber Dragon"
+      enchants: ["protection:4", "unbreaking:3"]
+      model-data: 0
+    leggings:
+      material: NETHERITE_LEGGINGS
+      name: "&b&l⚡ Quần Cyber Dragon"
+      enchants: ["protection:4", "unbreaking:3"]
+      model-data: 0
+    boots:
+      material: NETHERITE_BOOTS
+      name: "&b&l⚡ Giày Cyber Dragon"
+      enchants: ["protection:4", "unbreaking:3", "feather_falling:4"]
+      model-data: 0
+
+  # Nội tại từng món (chỉ cần mặc món đó, không cần đủ bộ)
+  passive:
+    helmet-damage: 0.10     # Mũ: +10% sát thương gây ra
+    chest-reduction: 0.12   # Giáp ngực: -12% sát thương nhận vào
+    legs-speed: 0.15        # Quần: +15% tốc độ di chuyển
+    boots-speed: 0.20       # Giày: +20% tốc độ di chuyển
+
+  # Kỹ năng bộ (đủ 4 món). Hồi chiêu tính từ lúc kích hoạt, độc lập từng skill.
+  cyber-shield:             # I. phòng thủ
+    chance: 15              # % khi nhận sát thương
+    reduction: 0.40
+    seconds: 4
+    cooldown: 45
+  overdrive:                # II. tấn công
+    health-below: 0.50
+    damage-bonus: 0.25
+    speed-bonus: 0.20
+    seconds: 8
+    cooldown: 60
+  energy-absorption:        # III. phòng thủ
+    chance: 15
+    heal-percent: 0.05      # 5% máu tối đa
+    cooldown: 15
+  ultimate:                 # IV. sinh tồn (thay thế Overdrive nếu đang chạy)
+    health-below: 0.20
+    reduction: 0.35
+    damage-bonus: 0.25
+    seconds: 8
+    cooldown: 120
+
+  # Trần giảm sát thương tổng (nội tại + Shield + Ultimate cộng dồn nhân nhau)
+  max-total-reduction: 0.70
+
+# ======================================================
+#  GLOWING - phát sáng để nhận ra người quyền quý
+#  Mặc bất kỳ 1 món là sáng, tháo hết là tắt (cập nhật mỗi 0.5 giây)
+# ======================================================
+glowing:
+  enabled: true
+  cyber-dragon: true   # mặc bất kỳ 1 món giáp Cyber Dragon
+  astrax-set: true     # mặc bất kỳ 1 món giáp thuộc set Astrax (sets.* trong config)

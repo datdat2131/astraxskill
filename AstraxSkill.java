@@ -7,6 +7,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class AstraxSkill extends JavaPlugin {
     private static AstraxSkill instance;
     private SetManager sets;
+    private HacLong hac;
+    private CyberDragon cyber;
 
     public static AstraxSkill get() {
         return instance;
@@ -14,6 +16,14 @@ public class AstraxSkill extends JavaPlugin {
 
     public SetManager sets() {
         return sets;
+    }
+
+    public HacLong hac() {
+        return hac;
+    }
+
+    public CyberDragon cyber() {
+        return cyber;
     }
 
     @Override
@@ -24,6 +34,12 @@ public class AstraxSkill extends JavaPlugin {
         sets = new SetManager(this);
 
         getServer().getPluginManager().registerEvents(new SkillListener(this), this);
+        hac = new HacLong(this);
+        getServer().getPluginManager().registerEvents(hac, this);
+        hac.startTasks();
+        cyber = new CyberDragon(this);
+        getServer().getPluginManager().registerEvents(cyber, this);
+        cyber.startTasks();
         AstraxCommand cmd = new AstraxCommand(this);
         getCommand("astrax").setExecutor(cmd);
         getCommand("astrax").setTabCompleter(cmd);
@@ -34,5 +50,10 @@ public class AstraxSkill extends JavaPlugin {
         }, 40L, 40L);
 
         getLogger().info("AstraxSkill da bat!");
+    }
+
+    @Override
+    public void onDisable() {
+        if (cyber != null) cyber.shutdown();
     }
 }
